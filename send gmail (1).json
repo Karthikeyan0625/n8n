@@ -1,0 +1,193 @@
+{
+  "name": "send gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        0
+      ],
+      "id": "fb94b583-bfe0-454c-8584-054d83aaa53d",
+      "name": "When chat message received",
+      "webhookId": "3ae59ab2-bcc6-4491-9b79-e9ffdade815c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are the Gmail Send Message Agent responsible for sending personalized emails using Gmail. The user will give a command (e.g., “Send emails to contacts”), and you must take the following actions automatically: \nthen any one says first message you reply how can i help you ?\n\n🔗 Data Source:\n\nThe user will provide or connect a Google Spreadsheet containing contact information.\n\nThe spreadsheet will contain the following columns:\n\nname: The recipient’s name\n\nemail: The recipient’s email address\n\nsub: The subject line of the email\n\n(Optional: You can include a message column for custom message content if available.)\n\n📧 Gmail Send Message Instructions:\n\nFor each row in the spreadsheet:\n\nUse the email value as the recipient.\n\nUse the sub value as the subject.\n\nPersonalize the message body using the name field.\n\nUse this default message body unless a custom message column is available:\n\nHello {{name}},\n\nI hope this message finds you well.\n\nThere is my first n8n project and the n8n is intresting technology there is advanced AI model thankyou my dear friend\n\nBest regards,\nkarthikeyan\n\n⚠️ Validation & Questions:\n\nIf any value (like email or name) is missing or seems invalid, stop and ask the user before sending.\n\nConfirm with the user if a message body is not provided or if customization is unclear.\n\n🚀 Goal:\n\nLoop through all valid rows and send individual Gmail messages accordingly.\n\nEnsure clear logging or confirmation of sent messages per row."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "27daffd6-3999-43d1-bad5-1abd82d4c7e6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-thinking-exp-01-21",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        192
+      ],
+      "id": "2245060a-82e9-469b-bbda-a69ef3d466be",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "l8ekx4Yf6eklznf9",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1XlItPBeBkJuxdGNdKFWhYpLxK7XTxG5WP-wyrIUhraQ",
+          "mode": "list",
+          "cachedResultName": "AI Auto",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XlItPBeBkJuxdGNdKFWhYpLxK7XTxG5WP-wyrIUhraQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XlItPBeBkJuxdGNdKFWhYpLxK7XTxG5WP-wyrIUhraQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        224
+      ],
+      "id": "f391cb45-d494-468f-a497-52416cf68a46",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "y20fixMalywKJRu7",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        176
+      ],
+      "id": "4401eb0e-4c45-471e-afc9-20900c57f04e",
+      "name": "Send a message in Gmail",
+      "webhookId": "00e50d82-cd3e-42bb-9b67-aac2350a2fa4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D7MIg1JtyEQGtNXf",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        208
+      ],
+      "id": "950c582f-eabf-4da1-9b34-d7c60f524de5",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0eddfd37-87dc-4c5f-a479-c6737b204659",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7b27c9853d36336274f9235291aafdbfb523f7670fef2e0f832702148cf79242"
+  },
+  "id": "C7ScGOXEq8mogoq7",
+  "tags": []
+}
